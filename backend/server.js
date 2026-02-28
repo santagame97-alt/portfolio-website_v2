@@ -19,11 +19,28 @@ const PORT = process.env.PORT || 3000;
 
 // Инициализация базы данных при запуске
 const DB_PATH = path.join(__dirname, '..', 'database', 'portfolio.db');
-if (!fs.existsSync(DB_PATH)) {
-  console.log('База данных не найдена, инициализация...');
+try {
+  if (!fs.existsSync(DB_PATH)) {
+    console.log('База данных не найдена, инициализация...');
+    initDatabase();
+  } else {
+    // Проверка что таблицы существуют
+    const Database = (await import('better-sqlite3')).default;
+    const db = new Database(DB_PATH);
+    const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='users'").get();
+    db.close();
+    
+    if (!tables) {
+      console.log('Таблицы не найдены, инициализация...');
+      initDatabase();
+    } else {
+      console.log('✓ База данных найдена');
+    }
+  }
+} catch (error) {
+  console.error('Ошибка при проверке базы данных:', error);
+  console.log('Попытка инициализации...');
   initDatabase();
-} else {
-  console.log('✓ База данных найдена');
 }
 
 // MIME types для статических файлов
