@@ -24,8 +24,8 @@ export function initDatabase() {
   console.log('✓ Схема базы данных создана');
   
   // Создание администратора по умолчанию
-  const adminEmail = 'admin@example.com';
-  const adminPassword = 'admin123'; // Изменить в продакшн!
+  const adminEmail = 'santagame98@gmail.com';
+  const adminPassword = 'RfccQ34sR8vyVP5'; // Ваш пароль
   
   const existingAdmin = db.prepare('SELECT id FROM users WHERE email = ?').get(adminEmail);
   
@@ -34,14 +34,16 @@ export function initDatabase() {
     db.prepare(`
       INSERT INTO users (email, password_hash, name, is_admin)
       VALUES (?, ?, ?, 1)
-    `).run(adminEmail, passwordHash, 'Администратор');
+    `).run(adminEmail, passwordHash, 'Santa');
     
     console.log('✓ Администратор создан');
     console.log(`  Email: ${adminEmail}`);
-    console.log(`  Пароль: ${adminPassword}`);
     console.log('  ⚠️  ВАЖНО: Измените пароль администратора после первого входа!');
   } else {
     console.log('✓ Администратор уже существует');
+    
+    // Убедимся что пользователь является администратором
+    db.prepare('UPDATE users SET is_admin = 1 WHERE email = ?').run(adminEmail);
   }
   
   db.close();
