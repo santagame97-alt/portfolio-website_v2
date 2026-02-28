@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Доступ запрещен - 403</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .error-page {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .error-content {
+      max-width: 600px;
+    }
+
+    .error-code {
+      font-size: 8rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .error-title {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: var(--text-color);
+    }
+
+    .error-message {
+      font-size: 1.1rem;
+      color: var(--text-light);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .error-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .error-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <div class="nav-brand">
+        <a href="/">Портфолио</a>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="/">Главная</a></li>
+        <li><a href="/portfolio.html">Работы</a></li>
+        <li>
+          <button class="theme-toggle" id="theme-toggle" aria-label="Переключить тему">
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+        </li>
+      </ul>
+      <button class="nav-toggle" aria-label="Открыть меню">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+  </header>
+
+  <main class="main">
+    <div class="error-page">
+      <div class="error-content">
+        <div class="error-icon">🔒</div>
+        <div class="error-code">403</div>
+        <h1 class="error-title">Доступ запрещен</h1>
+        <p class="error-message">
+          У вас нет прав для доступа к этой странице. Для доступа к админ-панели требуются права администратора.
+        </p>
+        <div class="error-actions">
+          <a href="/" class="btn btn-primary">На главную</a>
+          <a href="/login.html" class="btn btn-secondary">Войти</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 Портфолио. Все права защищены.</p>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>
