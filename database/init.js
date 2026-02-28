@@ -43,7 +43,17 @@ export function initDatabase() {
     console.log('✓ Администратор уже существует');
     
     // Убедимся что пользователь является администратором
-    db.prepare('UPDATE users SET is_admin = 1 WHERE email = ?').run(adminEmail);
+    const updated = db.prepare('UPDATE users SET is_admin = 1 WHERE email = ?').run(adminEmail);
+    if (updated.changes > 0) {
+      console.log(`  ✓ Пользователь ${adminEmail} назначен администратором`);
+    }
+  }
+  
+  // Также проверим и обновим старого админа если он есть
+  const oldAdmin = db.prepare('SELECT id FROM users WHERE email = ?').get('admin@example.com');
+  if (oldAdmin) {
+    db.prepare('UPDATE users SET is_admin = 1 WHERE email = ?').run('admin@example.com');
+    console.log('  ✓ Старый администратор admin@example.com также активен');
   }
   
   db.close();
