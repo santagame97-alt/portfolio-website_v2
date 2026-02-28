@@ -101,11 +101,57 @@
 
         <!-- Секция сообщений -->
         <section id="messages-section" class="admin-section">
-          <div class="section-header">
-            <h1>Сообщения</h1>
-          </div>
-          <div id="messages-list" class="messages-admin-list">
-            <div class="loading">Загрузка...</div>
+          <div class="messenger-container">
+            <!-- Список чатов -->
+            <div class="messenger-sidebar">
+              <div class="messenger-sidebar-header">
+                <h2>Чаты</h2>
+              </div>
+              <div id="chats-list" class="chats-list">
+                <div class="loading">Загрузка...</div>
+              </div>
+            </div>
+
+            <!-- Окно чата -->
+            <div class="messenger-main">
+              <div id="chat-empty" class="chat-empty">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <p>Выберите чат для начала переписки</p>
+              </div>
+
+              <div id="chat-window" class="chat-window" style="display: none;">
+                <!-- Заголовок чата -->
+                <div class="chat-header">
+                  <div class="chat-header-info">
+                    <h3 id="chat-user-name">Пользователь</h3>
+                    <span id="chat-user-email" class="chat-user-email">email@example.com</span>
+                  </div>
+                </div>
+
+                <!-- Сообщения -->
+                <div id="chat-messages" class="chat-messages">
+                  <div class="loading">Загрузка сообщений...</div>
+                </div>
+
+                <!-- Форма отправки -->
+                <form id="chat-form" class="chat-form">
+                  <textarea 
+                    id="chat-input" 
+                    placeholder="Введите сообщение..." 
+                    rows="1"
+                    maxlength="1000"
+                  ></textarea>
+                  <button type="submit" class="chat-send-btn" title="Отправить">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="22" y1="2" x2="11" y2="13"></line>
+                      <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
         </section>
 
