@@ -1,17 +1,66 @@
 // Админ-панель функциональность
 
 // Проверка прав администратора
-function checkAdminAccess() {
+async function checkAdminAccess() {
   const token = localStorage.getItem('authToken');
   const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
-  if (!token || !isAdmin) {
-    alert('Доступ запрещен. Требуются права администратора.');
-    window.location.href = '/';
+  console.log('Проверка прав администратора:');
+  console.log('- Token:', token ? 'Есть' : 'Нет');
+  console.log('- isAdmin:', localStorage.getItem('isAdmin'));
+  console.log('- isAdmin (boolean):', isAdmin);
+
+  // Если нет токена, перенаправляем на логин
+  if (!token) {
+    console.warn('Токен отсутствует, перенаправление на страницу входа');
+    window.location.href = '/login.html';
     return false;
   }
 
-  return true;
+  // Если isAdmin = false, сразу блокируем
+  if (!isAdmin) {
+    console.warn('isAdmin = false, доступ запрещен');
+    window.location.href = '/403.html';
+    return false;
+  }
+
+  // Дополнительная проверка на сервере
+  try {
+    const response = await fetch('/api/auth/validate', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.valid || !data.user || !data.user.isAdmin) {
+      console.error('Проверка на сервере не прошла:', data);
+      console.error('- response.ok:', response.ok);
+      console.error('- data.valid:', data.valid);
+      console.error('- data.user:', data.user);
+      console.error('- data.user.isAdmin:', data.user?.isAdmin);
+      
+      // Очищаем localStorage и перенаправляем
+      localStorage.clear();
+      window.location.href = '/403.html';
+      return false;
+    }
+
+    // Синхронизируем данные с сервером
+    localStorage.setItem('userId', data.user.id);
+    localStorage.setItem('userName', data.user.name);
+    localStorage.setItem('isAdmin', data.user.isAdmin ? 'true' : 'false');
+    localStorage.setItem('userBanned', data.user.isBanned ? 'true' : 'false');
+
+    console.log('✓ Проверка прав администратора успешна');
+    return true;
+  } catch (error) {
+    console.error('Ошибка проверки прав:', error);
+    localStorage.clear();
+    window.location.href = '/login.html';
+    return false;
+  }
 }
 
 // Переключение секций
@@ -111,13 +160,25 @@ async function loadMessages() {
 
   try {
     const token = localStorage.getItem('authToken');
+    const isAdmin = localStorage.getItem('isAdmin');
+    
+    console.log('Загрузка чатов...');
+    console.log('Token:', token ? 'Есть' : 'Нет');
+    console.log('isAdmin:', isAdmin);
+    
     const response = await fetch('/api/chats', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
     });
 
-    if (!response.ok) throw new Error('Ошибка загрузки');
+    console.log('Ответ сервера:', response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Ошибка от сервера:', errorData);
+      throw new Error(errorData.message || 'Ошибка загрузки');
+    }
 
     chatsData = await response.json();
 
@@ -547,9 +608,10 @@ function escapeHtml(text) {
 }
 
 // Инициализация
-document.addEventListener('DOMContentLoaded', () => {
-  // Проверка прав доступа
-  if (!checkAdminAccess()) return;
+document.addEventListener('DOMContentLoaded', async () => {
+  // Проверка прав доступа (асинхронная)
+  const hasAccess = await checkAdminAccess();
+  if (!hasAccess) return;
 
   // Инициализация темы
   initTheme();
@@ -613,6 +675,59 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+// Глобальная функция для отладки (можно вызвать из консоли браузера)
+window.checkAdminStatus = async function() {
+  console.log('=== ПРОВЕРКА СТАТУСА АДМИНИСТРАТОРА ===');
+  console.log('1. LocalStorage:');
+  console.log('   - authToken:', localStorage.getItem('authToken') ? 'Есть' : 'Нет');
+  console.log('   - isAdmin:', localStorage.getItem('isAdmin'));
+  console.log('   - userId:', localStorage.getItem('userId'));
+  
+  const token = localStorage.getItem('authToken');
+  if (token) {
+    console.log('\n2. Проверка токена на сервере:');
+    try {
+      const response = await fetch('/api/auth/validate', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      console.log('   Ответ сервера:', data);
+      
+      if (data.valid && data.user) {
+        console.log('\n3. Данные пользователя с сервера:');
+        console.log('   - ID:', data.user.id);
+        console.log('   - Email:', data.user.email);
+        console.log('   - Имя:', data.user.name);
+        console.log('   - isAdmin:', data.user.isAdmin);
+        console.log('   - isBanned:', data.user.isBanned);
+        
+        if (!data.user.isAdmin) {
+          console.log('\n⚠️ ПРОБЛЕМА: Пользователь НЕ является администратором!');
+          console.log('Решение: Войдите под аккаунтом администратора (santagame98@gmail.com)');
+        } else {
+          console.log('\n✓ Все в порядке! Пользователь является администратором.');
+          
+          // Синхронизируем localStorage с данными сервера
+          if (localStorage.getItem('isAdmin') !== 'true') {
+            console.log('\n⚠️ Обнаружено несоответствие в localStorage. Исправляю...');
+            localStorage.setItem('isAdmin', 'true');
+            console.log('✓ localStorage обновлен. Перезагрузите страницу.');
+          }
+        }
+      }
+    } catch (error) {
+      console.error('   Ошибка при проверке:', error);
+    }
+  } else {
+    console.log('\n⚠️ Токен отсутствует. Необходимо войти в систему.');
+  }
+  
+  console.log('\n=== КОНЕЦ ПРОВЕРКИ ===');
+  console.log('Для повторной проверки введите: checkAdminStatus()');
+};
 
 // Инициализация темы
 function initTheme() {
