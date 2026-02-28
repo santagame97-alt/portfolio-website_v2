@@ -1,9 +1,20 @@
 // Утилиты для валидации
 const validators = {
   email: (value) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Более строгая проверка email
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     if (!value) return 'Email обязателен';
     if (!emailRegex.test(value)) return 'Введите корректный email';
+    
+    // Проверка на популярные домены
+    const domain = value.split('@')[1]?.toLowerCase();
+    const validDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'mail.ru', 'yandex.ru', 'icloud.com'];
+    const hasValidTLD = /\.[a-z]{2,}$/i.test(domain);
+    
+    if (!hasValidTLD) {
+      return 'Email должен содержать корректный домен (например, @gmail.com)';
+    }
+    
     return null;
   },
 
