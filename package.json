@@ -1,0 +1,31 @@
+{
+  "name": "portfolio-messaging-system",
+  "version": "1.0.0",
+  "description": "Сайт-портфолио с системой сообщений в реальном времени",
+  "main": "backend/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node --watch backend/server.js",
+    "test": "node --test",
+    "init": "node database/init.js"
+  },
+  "keywords": [
+    "portfolio",
+    "messaging",
+    "websocket",
+    "real-time"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "better-sqlite3": "^12.6.2",
+    "dotenv": "^17.3.1",
+    "jsonwebtoken": "^9.0.2",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "fast-check": "^3.15.0"
+  }
+}

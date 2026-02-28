@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Регистрация в системе портфолио">
+  <title>Регистрация - Портфолио</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <div class="nav-brand">
+        <a href="/">Портфолио</a>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="/">Главная</a></li>
+        <li><a href="/portfolio.html">Работы</a></li>
+        <li>
+          <a href="/login.html">Вход</a>
+        </li>
+      </ul>
+      <button class="nav-toggle" aria-label="Открыть меню">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+  </header>
+
+  <main class="main">
+    <div class="auth-container">
+      <div class="auth-card">
+        <h1>Регистрация</h1>
+        <p class="auth-subtitle">Создайте аккаунт для доступа к чату</p>
+
+        <form id="register-form" class="auth-form" novalidate>
+          <div class="form-group">
+            <label for="name">Имя</label>
+            <input 
+              type="text" 
+              id="name" 
+              name="name" 
+              required 
+              minlength="2" 
+              maxlength="100"
+              placeholder="Введите ваше имя"
+              autocomplete="name"
+            >
+            <span class="error-message" id="name-error"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              required 
+              placeholder="example@mail.com"
+              autocomplete="email"
+            >
+            <span class="error-message" id="email-error"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Пароль</label>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              required 
+              minlength="8" 
+              maxlength="100"
+              placeholder="Минимум 8 символов"
+              autocomplete="new-password"
+            >
+            <span class="error-message" id="password-error"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="confirm-password">Подтвердите пароль</label>
+            <input 
+              type="password" 
+              id="confirm-password" 
+              name="confirm-password" 
+              required 
+              minlength="8" 
+              maxlength="100"
+              placeholder="Повторите пароль"
+              autocomplete="new-password"
+            >
+            <span class="error-message" id="confirm-password-error"></span>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">
+            Зарегистрироваться
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          <p>Уже есть аккаунт? <a href="/login.html">Войти</a></p>
+        </div>
+
+        <!-- Сообщения об успехе/ошибке -->
+        <div id="message-container" class="message-container hidden"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2024 Портфолио. Все права защищены.</p>
+    </div>
+  </footer>
+
+  <script src="/js/auth.js"></script>
+</body>
+</html>

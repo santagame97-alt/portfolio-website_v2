@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: portfolio-website
+    env: node
+    buildCommand: npm install
+    startCommand: node backend/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_ADMIN_CHAT_ID
+        sync: false
+    disk:
+      name: portfolio-data
+      mountPath: /app/database
+      sizeGB: 1

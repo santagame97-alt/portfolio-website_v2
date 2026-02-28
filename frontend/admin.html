@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Админ-панель">
+  <title>Админ-панель - Портфолио</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <div class="nav-brand">
+        <a href="/">Портфолио</a>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="/">Главная</a></li>
+        <li><a href="/portfolio.html">Работы</a></li>
+        <li><a href="/admin.html" class="active">Админ-панель</a></li>
+        <li><span style="color: var(--text-light);">Привет, Администратор</span></li>
+        <li><a href="#" id="logout-link">Выход</a></li>
+        <li>
+          <button class="theme-toggle" id="theme-toggle" aria-label="Переключить тему">
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+        </li>
+      </ul>
+      <button class="nav-toggle" aria-label="Открыть меню">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+  </header>
+
+  <main class="main admin-main">
+    <div class="admin-container">
+      <!-- Боковое меню -->
+      <aside class="admin-sidebar">
+        <h2>Управление</h2>
+        <nav class="admin-nav">
+          <a href="#portfolio" class="admin-nav-link active" data-section="portfolio">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            Портфолио
+          </a>
+          <a href="#messages" class="admin-nav-link" data-section="messages">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            Сообщения
+          </a>
+          <a href="#users" class="admin-nav-link" data-section="users">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            Пользователи
+          </a>
+        </nav>
+      </aside>
+
+      <!-- Основной контент -->
+      <div class="admin-content">
+        <!-- Секция портфолио -->
+        <section id="portfolio-section" class="admin-section active">
+          <div class="section-header">
+            <h1>Управление портфолио</h1>
+            <button class="btn btn-primary" id="add-portfolio-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Добавить работу
+            </button>
+          </div>
+          <div id="portfolio-list" class="portfolio-admin-list">
+            <div class="loading">Загрузка...</div>
+          </div>
+        </section>
+
+        <!-- Секция сообщений -->
+        <section id="messages-section" class="admin-section">
+          <div class="section-header">
+            <h1>Сообщения</h1>
+          </div>
+          <div id="messages-list" class="messages-admin-list">
+            <div class="loading">Загрузка...</div>
+          </div>
+        </section>
+
+        <!-- Секция пользователей -->
+        <section id="users-section" class="admin-section">
+          <div class="section-header">
+            <h1>Пользователи</h1>
+          </div>
+          <div id="users-list" class="users-admin-list">
+            <div class="loading">Загрузка...</div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2024 Портфолио. Все права защищены.</p>
+    </div>
+  </footer>
+
+  <!-- Модальное окно добавления работы -->
+  <div id="add-portfolio-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Добавить работу</h2>
+        <button class="modal-close" onclick="closeAddPortfolioModal()">&times;</button>
+      </div>
+      <form id="add-portfolio-form" class="modal-form">
+        <div class="form-group">
+          <label for="portfolio-title">Название работы *</label>
+          <input type="text" id="portfolio-title" name="title" required maxlength="200" placeholder="Введите название">
+        </div>
+        <div class="form-group">
+          <label for="portfolio-description">Краткое описание *</label>
+          <textarea id="portfolio-description" name="description" required maxlength="500" rows="3" placeholder="Краткое описание работы"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="portfolio-content">Полное описание *</label>
+          <textarea id="portfolio-content" name="content" required maxlength="5000" rows="6" placeholder="Подробное описание работы"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="portfolio-images">Изображения</label>
+          <input type="file" id="portfolio-images" name="images" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" multiple>
+          <small style="color: var(--text-light); display: block; margin-top: 0.5rem;">
+            Можно выбрать несколько изображений (JPG, PNG, GIF, WebP, макс. 5 МБ каждое)
+          </small>
+          <div id="image-preview" class="image-preview"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeAddPortfolioModal()">Отмена</button>
+          <button type="submit" class="btn btn-primary">Добавить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

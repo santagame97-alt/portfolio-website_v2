@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Чат с администратором">
+  <title>Чат - Портфолио</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/chat.css">
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <div class="nav-brand">
+        <a href="/">Портфолио</a>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="/">Главная</a></li>
+        <li><a href="/portfolio.html">Работы</a></li>
+        <li id="auth-links">
+          <a href="/login.html">Вход</a>
+          <a href="/register.html">Регистрация</a>
+        </li>
+        <li>
+          <button class="theme-toggle" id="theme-toggle" aria-label="Переключить тему">
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+        </li>
+      </ul>
+      <button class="nav-toggle" aria-label="Открыть меню">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+  </header>
+
+  <main class="main chat-main">
+    <div class="chat-container">
+      <!-- Заголовок чата -->
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <h1>Чат с администратором</h1>
+          <div class="connection-status" id="connection-status">
+            <span class="status-indicator"></span>
+            <span class="status-text">Подключение...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- История сообщений -->
+      <div class="chat-messages" id="chat-messages">
+        <div class="messages-loading" id="messages-loading">
+          <div class="spinner"></div>
+          <p>Загрузка сообщений...</p>
+        </div>
+        <div class="messages-list" id="messages-list">
+          <!-- Сообщения будут добавлены динамически -->
+        </div>
+      </div>
+
+      <!-- Форма отправки сообщения -->
+      <div class="chat-input-container">
+        <form class="chat-form" id="chat-form">
+          <textarea 
+            class="chat-input" 
+            id="message-input" 
+            placeholder="Введите сообщение..."
+            rows="1"
+            maxlength="5000"
+            required
+          ></textarea>
+          <button type="submit" class="btn-send" id="send-button" aria-label="Отправить сообщение">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </form>
+        <div class="chat-error" id="chat-error"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2024 Портфолио. Все права защищены.</p>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+  <script src="/js/chat.js"></script>
+</body>
+</html>
