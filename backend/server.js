@@ -10,11 +10,21 @@ import { handleGetAllItems, handleGetItemById, handleDeleteItem, handleCreateIte
 import { handleGetMyChat, handleGetAllChats, handleGetChatMessages, handleSendMessage, handleMarkMessagesAsRead } from './routes/chatRoutes.js';
 import { handleGetAllUsers, handleBanUser, handleUnbanUser } from './routes/userRoutes.js';
 import WebSocketServer from './services/WebSocketServer.js';
+import { initDatabase } from '../database/init.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 3000;
+
+// Инициализация базы данных при запуске
+const DB_PATH = path.join(__dirname, '..', 'database', 'portfolio.db');
+if (!fs.existsSync(DB_PATH)) {
+  console.log('База данных не найдена, инициализация...');
+  initDatabase();
+} else {
+  console.log('✓ База данных найдена');
+}
 
 // MIME types для статических файлов
 const MIME_TYPES = {
