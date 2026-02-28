@@ -99,9 +99,14 @@ async function loadPortfolioItems() {
   }
 }
 
-// Загрузка сообщений
+// Переменные для мессенджера
+let currentChatId = null;
+let adminWs = null;
+let chatsData = [];
+
+// Загрузка списка чатов
 async function loadMessages() {
-  const container = document.getElementById('messages-list');
+  const container = document.getElementById('chats-list');
   container.innerHTML = '<div class="loading">Загрузка...</div>';
 
   try {
@@ -114,32 +119,268 @@ async function loadMessages() {
 
     if (!response.ok) throw new Error('Ошибка загрузки');
 
-    const chats = await response.json();
+    chatsData = await response.json();
 
-    if (chats.length === 0) {
-      container.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 2rem;">Сообщений пока нет</p>';
+    if (chatsData.length === 0) {
+      container.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 2rem;">Чатов пока нет</p>';
       return;
     }
 
-    container.innerHTML = chats.map(chat => `
-      <div class="message-admin-item" onclick="openChat(${chat.id})">
-        <div class="message-admin-item-header">
-          <span class="message-admin-item-user">
-            ${escapeHtml(chat.userName)}
-            ${chat.unreadCount > 0 ? `<span class="unread-badge">${chat.unreadCount}</span>` : ''}
-          </span>
-          <span class="message-admin-item-time">${formatTime(chat.lastMessageAt)}</span>
-        </div>
-        <div class="message-admin-item-preview">
-          ${chat.lastMessage ? escapeHtml(chat.lastMessage.content).substring(0, 100) + '...' : 'Нет сообщений'}
-        </div>
+    renderChatsList();
+    
+    // Подключение WebSocket для админа
+    connectAdminWebSocket();
+
+  } catch (error) {
+    console.error('Ошибка загрузки чатов:', error);
+    container.innerHTML = '<p style="text-align: center; color: var(--danger-color); padding: 2rem;">Ошибка загрузки данных</p>';
+  }
+}
+
+// Отрисовка списка чатов
+function renderChatsList() {
+  const container = document.getElementById('chats-list');
+  
+  container.innerHTML = chatsData.map(chat => `
+    <div class="chat-item ${currentChatId === chat.id ? 'active' : ''}" onclick="selectChat(${chat.id})">
+      <div class="chat-item-header">
+        <span class="chat-item-name">${escapeHtml(chat.userName)}</span>
+        <span class="chat-item-time">${formatTime(chat.lastMessageAt)}</span>
       </div>
-    `).join('');
+      <div class="chat-item-preview">
+        ${chat.lastMessage ? escapeHtml(chat.lastMessage.content) : 'Нет сообщений'}
+      </div>
+      ${chat.unreadCount > 0 ? `<div class="chat-item-unread">${chat.unreadCount}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// Выбор чата
+async function selectChat(chatId) {
+  currentChatId = chatId;
+  renderChatsList();
+  
+  // Показываем окно чата
+  document.getElementById('chat-empty').style.display = 'none';
+  document.getElementById('chat-window').style.display = 'flex';
+  
+  // Загружаем информацию о чате
+  const chat = chatsData.find(c => c.id === chatId);
+  if (chat) {
+    document.getElementById('chat-user-name').textContent = chat.userName;
+    document.getElementById('chat-user-email').textContent = chat.userEmail || '';
+  }
+  
+  // Загружаем сообщения
+  await loadChatMessages(chatId);
+  
+  // Отмечаем сообщения как прочитанные
+  await markMessagesAsRead(chatId);
+}
+
+// Загрузка сообщений чата
+async function loadChatMessages(chatId) {
+  const container = document.getElementById('chat-messages');
+  container.innerHTML = '<div class="loading">Загрузка сообщений...</div>';
+
+  try {
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`/api/chats/${chatId}/messages`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) throw new Error('Ошибка загрузки сообщений');
+
+    const messages = await response.json();
+    
+    renderMessages(messages);
+    scrollToBottom();
 
   } catch (error) {
     console.error('Ошибка загрузки сообщений:', error);
-    container.innerHTML = '<p style="text-align: center; color: var(--danger-color); padding: 2rem;">Ошибка загрузки данных</p>';
+    container.innerHTML = '<p style="text-align: center; color: var(--danger-color);">Ошибка загрузки сообщений</p>';
   }
+}
+
+// Отрисовка сообщений
+function renderMessages(messages) {
+  const container = document.getElementById('chat-messages');
+  const currentUserId = parseInt(localStorage.getItem('userId'));
+  
+  if (messages.length === 0) {
+    container.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 2rem;">Сообщений пока нет</p>';
+    return;
+  }
+
+  container.innerHTML = messages.map(msg => {
+    const isSent = msg.senderId === currentUserId;
+    return `
+      <div class="message ${isSent ? 'sent' : 'received'}">
+        <div class="message-content">
+          <p class="message-text">${escapeHtml(msg.content)}</p>
+          <div class="message-time">${formatMessageTime(msg.createdAt)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Отправка сообщения
+async function sendMessage(content) {
+  if (!currentChatId || !content.trim()) return;
+
+  try {
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`/api/chats/${currentChatId}/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ content: content.trim() })
+    });
+
+    if (!response.ok) throw new Error('Ошибка отправки');
+
+    const message = await response.json();
+    
+    // Добавляем сообщение в интерфейс
+    addMessageToChat(message);
+    scrollToBottom();
+
+  } catch (error) {
+    console.error('Ошибка отправки сообщения:', error);
+    alert('Ошибка при отправке сообщения');
+  }
+}
+
+// Добавление сообщения в чат
+function addMessageToChat(message) {
+  const container = document.getElementById('chat-messages');
+  const currentUserId = parseInt(localStorage.getItem('userId'));
+  const isSent = message.senderId === currentUserId;
+  
+  // Удаляем заглушку если есть
+  const emptyMessage = container.querySelector('p');
+  if (emptyMessage) {
+    container.innerHTML = '';
+  }
+  
+  const messageEl = document.createElement('div');
+  messageEl.className = `message ${isSent ? 'sent' : 'received'}`;
+  messageEl.innerHTML = `
+    <div class="message-content">
+      <p class="message-text">${escapeHtml(message.content)}</p>
+      <div class="message-time">${formatMessageTime(message.createdAt)}</div>
+    </div>
+  `;
+  
+  container.appendChild(messageEl);
+}
+
+// Отметить сообщения как прочитанные
+async function markMessagesAsRead(chatId) {
+  try {
+    const token = localStorage.getItem('authToken');
+    await fetch(`/api/chats/${chatId}/read`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    // Обновляем счетчик непрочитанных
+    const chat = chatsData.find(c => c.id === chatId);
+    if (chat) {
+      chat.unreadCount = 0;
+      renderChatsList();
+    }
+
+  } catch (error) {
+    console.error('Ошибка отметки сообщений:', error);
+  }
+}
+
+// Подключение WebSocket для админа
+function connectAdminWebSocket() {
+  if (adminWs && adminWs.readyState === WebSocket.OPEN) {
+    return;
+  }
+
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const wsUrl = `${protocol}//${window.location.host}`;
+  
+  adminWs = new WebSocket(wsUrl);
+
+  adminWs.onopen = () => {
+    console.log('WebSocket подключен (админ)');
+    
+    // Аутентификация
+    const token = localStorage.getItem('authToken');
+    adminWs.send(JSON.stringify({
+      type: 'auth',
+      token: token
+    }));
+  };
+
+  adminWs.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      
+      if (data.type === 'new_message') {
+        handleNewMessage(data.message);
+      }
+    } catch (error) {
+      console.error('Ошибка обработки WebSocket сообщения:', error);
+    }
+  };
+
+  adminWs.onerror = (error) => {
+    console.error('WebSocket ошибка:', error);
+  };
+
+  adminWs.onclose = () => {
+    console.log('WebSocket отключен');
+    // Переподключение через 3 секунды
+    setTimeout(() => {
+      if (document.getElementById('messages-section').classList.contains('active')) {
+        connectAdminWebSocket();
+      }
+    }, 3000);
+  };
+}
+
+// Обработка нового сообщения через WebSocket
+function handleNewMessage(message) {
+  // Если сообщение в текущем чате - добавляем его
+  if (currentChatId === message.chatId) {
+    addMessageToChat(message);
+    scrollToBottom();
+    markMessagesAsRead(message.chatId);
+  } else {
+    // Обновляем счетчик непрочитанных
+    const chat = chatsData.find(c => c.id === message.chatId);
+    if (chat) {
+      chat.unreadCount = (chat.unreadCount || 0) + 1;
+      chat.lastMessage = message;
+      chat.lastMessageAt = message.createdAt;
+      renderChatsList();
+    }
+  }
+}
+
+// Прокрутка вниз
+function scrollToBottom() {
+  const container = document.getElementById('chat-messages');
+  container.scrollTop = container.scrollHeight;
+}
+
+// Форматирование времени сообщения
+function formatMessageTime(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
 }
 
 // Загрузка пользователей
@@ -239,11 +480,6 @@ async function unbanUser(userId) {
     console.error('Ошибка разбана пользователя:', error);
     alert('Ошибка при разбане пользователя');
   }
-}
-
-// Открыть чат
-function openChat(chatId) {
-  window.location.href = `/chat.html?chatId=${chatId}`;
 }
 
 // Редактировать работу портфолио
@@ -349,6 +585,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Обработчик переключения темы
   document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
+
+  // Обработчик формы отправки сообщения
+  document.getElementById('chat-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = document.getElementById('chat-input');
+    const content = input.value.trim();
+    
+    if (content) {
+      await sendMessage(content);
+      input.value = '';
+      input.style.height = 'auto';
+    }
+  });
+
+  // Автоматическое изменение высоты textarea
+  document.getElementById('chat-input')?.addEventListener('input', (e) => {
+    e.target.style.height = 'auto';
+    e.target.style.height = e.target.scrollHeight + 'px';
+  });
+
+  // Enter для отправки, Shift+Enter для новой строки
+  document.getElementById('chat-input')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      document.getElementById('chat-form').dispatchEvent(new Event('submit'));
+    }
+  });
 });
 
 // Инициализация темы
